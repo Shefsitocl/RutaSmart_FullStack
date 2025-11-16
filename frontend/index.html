@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistema Transporte — Admin / Chofer</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-layout {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 900px) {
+      .admin-top-row {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="appbar">
+    <div class="brand">
+      <div class="logo">RV</div>
+      <div>
+        <div class="title">Registro & Rutas de Vans</div>
+        <div class="small">Panel Admin / Chofer · RutaSmart</div>
+      </div>
+    </div>
+
+    <div class="controls" id="headerControls">
+      <button id="btnHome" class="btn" style="display:none">🏠 Inicio</button>
+      <div class="role-switch" id="roleButtons" style="display:none">
+        <button id="btnAdminView" class="btn">🔒 Admin</button>
+        <button id="btnDriverView" class="btn">🧑‍✈️ Chofer</button>
+      </div>
+      <button id="toggleTheme" class="btn" title="Cambiar tema">🌙</button>
+      <button id="btnLogout" class="btn" style="display:none">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Pantalla inicial -->
+    <div id="homeScreen" class="welcome-screen">
+      <h1>Registro y Rutas de Vans</h1>
+      <p class="small">Bienvenido — elige tu perfil para continuar</p>
+      <div class="welcome-buttons">
+        <button id="goAdmin" class="btn primary">🔒 Admin</button>
+        <button id="goDriver" class="btn primary">🧑‍✈️ Chofer</button>
+      </div>
+    </div>
+
+    <!-- Login Admin -->
+    <div id="adminLogin" class="center-card" style="display:none;max-width:420px;margin:20px auto;">
+      <div class="card">
+        <h3>Inicio de sesión - Admin</h3>
+        <form id="adminLoginForm" class="stack">
+          <div class="field">
+            <label>Usuario</label>
+            <input id="adminUser" value="admin" />
+          </div>
+          <div class="field">
+            <label>Contraseña</label>
+            <input id="adminPass" type="password" />
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button type="button" id="adminCancel" class="btn">Cancelar</button>
+            <button class="btn primary" type="submit">Ingresar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Login Chofer -->
+    <div id="driverLogin" style="display:none;max-width:420px;margin:20px auto;">
+      <div class="card">
+        <h3>Inicio de sesión - Chofer</h3>
+        <form id="loginForm" class="stack">
+          <div class="field">
+            <label>Usuario</label>
+            <input id="loginUsername" required />
+          </div>
+          <div class="field">
+            <label>Contraseña</label>
+            <input id="loginPassword" type="password" required />
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button type="button" id="driverCancel" class="btn">Cancelar</button>
+            <button class="btn primary" type="submit">Ingresar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Área del Administrador -->
+    <div id="adminArea" class="admin-layout" style="display:none">
+      <div class="admin-top-row">
+        <!-- Gestión de choferes -->
+        <section class="card new-section stack">
+          <h3 class="section-title">Gestión de Choferes</h3>
+          <form id="driverForm" class="stack" autocomplete="off">
+            <div class="field">
+              <label for="driverDisplayName">Nombre completo del chofer</label>
+              <input id="driverDisplayName" required placeholder="Ej. Pedro Gómez" />
+            </div>
+            <div class="field">
+              <label for="driverUsername">Usuario del chofer</label>
+              <input id="driverUsername" required placeholder="Ej. pgomez" />
+            </div>
+            <div class="field">
+              <label for="driverPassword">Contraseña</label>
+              <input id="driverPassword" type="password" required placeholder="Contraseña segura" />
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button type="reset" class="btn">Limpiar</button>
+              <button class="btn primary" type="submit">Guardar chofer</button>
+            </div>
+          </form>
+
+          <h4>Choferes registrados</h4>
+          <div style="overflow:auto;max-height:250px">
+            <table class="table" id="driversTable">
+              <thead>
+                <tr><th>#</th><th>Nombre</th><th>Usuario</th><th>Acciones</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Registro de trabajadores -->
+        <section class="card stack">
+          <h3 class="section-title">Registro de trabajador / Asignar a chofer</h3>
+          <form id="workerForm" class="stack" autocomplete="off">
+            <div class="field"><label for="name">Nombre</label><input id="name" required placeholder="Ej. Juan Pérez" /></div>
+            <div class="field"><label for="address">Dirección</label><input id="address" required placeholder="Ej. Av. Siempre Viva 742" /></div>
+            <div class="field"><label for="choferSelect">Asignar chofer</label><select id="choferSelect" required></select></div>
+            <div class="twocol">
+              <div class="field">
+                <label for="phone">Teléfono</label>
+                <div class="phone-input-group">
+                  <span>+56 9</span>
+                  <input id="phone" type="tel" required placeholder="xxxx xxxx" />
+                </div>
+              </div>
+              <div class="field"><label for="day">Día</label><select id="day" required></select></div>
+            </div>
+            <div class="twocol">
+              <div class="field"><label for="shift">Turno</label>
+                <select id="shift" required>
+                  <option value="Mañana">Mañana</option>
+                  <option value="Tarde">Tarde</option>
+                  <option value="Noche">Noche</option>
+                </select>
+              </div>
+              <div class="field"><label for="notes">Notas (opcional)</label><input id="notes" placeholder="Referencia, portón, etc." /></div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button type="reset" class="btn">Limpiar</button>
+              <button class="btn primary" type="submit">Agregar trabajador</button>
+            </div>
+          </form>
+          <div class="chips" id="stats"></div>
+        </section>
+      </div>
+
+      <!-- Configuración y rutas -->
+      <section class="card stack admin-route-controls">
+        <h3 class="section-title">Configuración y Generación de Rutas</h3>
+        <div class="threecol">
+          <div class="input-group">
+            <label for="base">📍 Dirección de la Base/Origen</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="base" placeholder="Ingresa la dirección de la base" style="flex: 1;" />
+              <button type="button" id="establecerBase" class="btn">Establecer</button>
+            </div>
+            <button type="button" id="useMyLocation" class="btn small" style="margin-top: 4px;">Usar mi ubicación</button>
+          </div>
+
+          <div class="card" style="background:transparent;border:none;padding:0;">
+            <div class="field"><label for="filterDayAdmin">Filtrar por día</label><select id="filterDayAdmin"></select></div>
+            <div class="field"><label for="filterShiftAdmin">Filtrar por turno</label>
+              <select id="filterShiftAdmin"><option value="">Todos</option><option>Mañana</option><option>Tarde</option><option>Noche</option></select>
+            </div>
+            <div class="field"><label>&nbsp;</label><button id="buildRouteAdmin" class="btn primary" style="width:100%">🚐 Generar ruta</button></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+          <button id="exportBtn" class="btn">⬇️ Exportar Trabajadores</button>
+          <input id="importFile" type="file" accept="application/json" style="display:none" />
+          <button id="importBtn" class="btn">⬆️ Importar Trabajadores</button>
+        </div>
+      </section>
+
+      <!-- Resultados y tabla filtrada -->
+      <section class="stack admin-results">
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 class="section-title">Mapa y Ruta</h3>
+          <div id="map" style="height: 400px;">Mapa interactivo aparecerá aquí</div>
+        </div>
+
+        <div class="card route-details">
+          <h3 class="section-title">Orden Sugerido</h3>
+          <div id="routeSummary" class="chips" style="margin-bottom: 12px;"></div>
+          <div id="routeList"></div>
+        </div>
+
+        <div class="card workers-table-full">
+          <h3 class="section-title">Trabajadores Filtrados</h3>
+          <div style="overflow:auto">
+            <table class="table" id="workersTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre</th>
+                  <th>Dirección</th>
+                  <th>Chofer</th>
+                  <th>Día</th>
+                  <th>Turno</th>
+                  <th>Teléfono</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="workersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Área del Chofer -->
+    <div id="driverArea" style="display:none">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <strong>Bienvenido, <span id="driverNameDisplay"></span></strong>
+          <div class="small">Tus rutas asignadas</div>
+        </div>
+        <button id="logoutDriver" class="btn">Cerrar sesión</button>
+      </div>
+
+      <section class="card" style="margin-top:10px; display:grid; gap:12px;">
+        <h3 class="section-title">📍 Configuración de Ruta</h3>
+        <div class="field">
+          <label for="driverBaseInput">Dirección de la Base/Origen</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="driverBaseInput" placeholder="Ingresa la base o punto de partida" style="flex:1;" />
+            <button id="driverSetBase" class="btn">Establecer</button>
+          </div>
+          <button id="driverUseMyLocation" class="btn small" style="margin-top:4px;">Usar mi ubicación</button>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:12px;">
+          <div class="field">
+            <label for="filterDayDriver">Filtrar por día</label>
+            <select id="filterDayDriver"></select>
+          </div>
+          <div class="field">
+            <label for="filterShiftDriver">Filtrar por turno</label>
+            <select id="filterShiftDriver">
+              <option value="">Todos</option>
+              <option>Mañana</option>
+              <option>Tarde</option>
+              <option>Noche</option>
+            </select>
+          </div>
+          <div class="field" style="align-self:end;">
+            <button id="applyFiltersDriver" class="btn primary">Aplicar filtros</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="driverMap" style="width:100%;height:400px;margin-top:10px;"></div>
+
+      <div class="card">
+        <h3 class="section-title">Trabajadores Asignados (Ordenado por Ruta)</h3>
+        <div style="overflow:auto">
+          <table class="table" id="driverRoutesTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Dirección (Link)</th>
+                <th>Teléfono</th>
+                <th>Distancia (Base)</th>
+                <th>Día</th>
+                <th>Turno</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <p class="footer">Bienvenidos a RUTASMART</p>
+  </main>
+
+  <dialog id="errorModal">
+    <p id="errorText">Credenciales incorrectas.</p>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button class="btn" onclick="document.getElementById('errorModal').close()">Cerrar</button>
+    </div>
+  </dialog>
+
+  <!-- Scripts -->
+  <script src="java.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvTE1ezjorLHKXHTaccgOqV-uQZQAehX8&libraries=places&callback=initAppServices"></script>
+</body>
+</html>
